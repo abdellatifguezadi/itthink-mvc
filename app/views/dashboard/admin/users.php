@@ -8,25 +8,30 @@
                     <div class="flex justify-between">
                     <h3 class="text-3xl font-medium text-gray-700">Users</h3>
 
-                    <!-- Search input -->
-                    <form method="GET">
-                        <div class="relative mx-4 lg:mx-0">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                                <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none">
-                                    <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                                </svg>
-                            </span>
-                            <input type="text" name="userToSearch" onchange="this.form.submit()" class="w-32 pl-10 py-1 pr-4 rounded-md form-input sm:w-64 focus:border-indigo-600 focus:outline-none" placeholder="Search" value="<?= isset($_GET['userToSearch']) ? htmlspecialchars($_GET['userToSearch']) : '' ?>">
-                        </div>
-                    </form>
+                    <!-- Formulaire de recherche -->
+                    <form method="GET" class="mb-4">
+                        <div class="flex items-center space-x-4">
+                            <!-- Filtre -->
+                            <select name="filter" class="rounded-lg px-2 py-1 focus:outline-none" onchange="this.form.submit()">
+                                <option value="all" <?= $currentFilter === 'all' ? 'selected' : '' ?>>Tous les utilisateurs</option>
+                                <option value="clients" <?= $currentFilter === 'clients' ? 'selected' : '' ?>>Clients</option>
+                                <option value="freelancers" <?= $currentFilter === 'freelancers' ? 'selected' : '' ?>>Freelancers</option>
+                            </select>
 
-                    <!-- Filter select -->
-                    <form method="GET">
-                        <select name="filter" class="rounded-lg px-2 py-1 focus:outline-none" onchange="this.form.submit()">
-                            <option value="all" <?= isset($_GET['filter']) && $_GET['filter'] == 'all' ? 'selected' : '' ?>>ALL</option>
-                            <option value="clients" <?= isset($_GET['filter']) && $_GET['filter'] == 'clients' ? 'selected' : '' ?>>Clients</option>
-                            <option value="freelancers" <?= isset($_GET['filter']) && $_GET['filter'] == 'freelancers' ? 'selected' : '' ?>>Freelancers</option>
-                        </select>
+                            <!-- Recherche -->
+                            <div class="relative">
+                                <input type="text" 
+                                       name="userToSearch" 
+                                       value="<?= htmlspecialchars($searchTerm) ?>" 
+                                       placeholder="Rechercher un utilisateur..."
+                                       class="pl-10 pr-4 py-2 rounded-md border focus:outline-none focus:border-indigo-500">
+                                <button type="submit" class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </form>
                 </div>
     
@@ -75,7 +80,7 @@
                                                 </td>
         
                                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                                    <form method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to change the status of this user?');">
+                                                    <form method="POST" action="/status_user" style="display:inline;" onsubmit="return confirm('Are you sure you want to change the status of this user?');">
                                                         <input type="hidden" name="block_user_id" value="<?= $user['id_utilisateur']; ?>">
                                                             <button type="submit" class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
                                                                 <?= $user['is_active']==1?"Active": "blocked"?>
@@ -89,7 +94,7 @@
         
                                                 <td class="px-6 py-4 text-sm font-medium leading-5 text-right whitespace-no-wrap border-b border-gray-200">
                                                     <!-- Remove User Form with Confirmation -->
-                                                    <form method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to remove this user?');">
+                                                    <form method="POST" action="/remove_user" style="display:inline;" onsubmit="return confirm('Are you sure you want to remove this user?');">
                                                         <input type="hidden" name="remove_user" value="<?= $user['id_utilisateur']; ?>">
                                                         <button type="submit" class="text-indigo-600 hover:text-indigo-900">Remove</button>
                                                     </form>

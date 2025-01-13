@@ -33,7 +33,7 @@ class AuthController extends BaseController {
              $password = $_POST['password'];
              $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-             $user = [$full_name,$hashed_password,$email,$role];
+             $user = [$full_name, $hashed_password, $email, $role];
 
              
 
@@ -44,15 +44,22 @@ class AuthController extends BaseController {
                  $_SESSION['user_loged_in_id'] = $lastInsertId ;
                  $_SESSION['user_loged_in_role'] = $role;
  
-                 if ($lastInsertId && $role == 1) {
-                     header('Location: admin/dashboard');
-                 } else if ($lastInsertId && $role == 2) {
-                     header('Location: client/dashboard');
-                 } else if ($lastInsertId && $role == 3) {
-                     header('Location: freelancer/dashboard');
-                 }                    
-                 
-                 exit;
+                 if ($lastInsertId) {
+                     switch ($role) {
+                         case "1": // Admin
+                             header('Location: /admin');
+                             break;
+                         case "2": // Client 
+                             header('Location: /client');
+                             break;
+                         case "3": // Freelancer
+                             header('Location: /freelancer/dashboard');
+                             break;
+                         default:
+                             header('Location: /login');
+                     }
+                     exit;
+                 }
              
          }
      }
@@ -64,22 +71,35 @@ class AuthController extends BaseController {
           if (isset($_POST['login'])) {
               $email = $_POST['email'];
               $password = $_POST['password'];
-              $userData = [$email,$password];
+              $userData = [$email, $password];
               $user = $this->UserModel->login($userData);
-              $role = $user['role'] ; 
-            // var_dump($user);die();
-              $_SESSION['user_loged_in_id'] = $user["id_utilisateur"];
-              $_SESSION['user_loged_in_role'] = $role;
-              $_SESSION['user_loged_in_nome'] = $user['nom_utilisateur'];
-  
-              if ($user && $role == 1) {
-                  header('Location: /admin/dashboard');
-              } else if ($user && $role == 2) {
-                  header('Location: Client/dashboard.php');
-              } else if ($user && $role == 3) {
-                  header('Location: Freelancer/dashboard.php');
-              } 
-             
+              
+              if ($user) {
+                  $role = $user['role'];
+                  $_SESSION['user_loged_in_id'] = $user["id_utilisateur"];
+                  $_SESSION['user_loged_in_role'] = $role;
+                  $_SESSION['user_loged_in_nome'] = $user['nom_utilisateur'];
+
+                  // Redirection selon le rôle
+                  switch ($role) {
+                      case "1": // Admin
+                          header('Location: /admin');
+                          break;
+                      case "2": // Client
+                          header('Location: /client');
+                          break;
+                      case "3": // Freelancer
+                          header('Location: /freelancer/dashboard');
+                          break;
+                      default:
+                          header('Location: /login');
+                  }
+                  exit;
+              } else {
+                  // Gérer l'échec de connexion
+                  header('Location: /login?error=invalid_credentials');
+                  exit;
+              }
           }
       }
  
@@ -88,9 +108,6 @@ class AuthController extends BaseController {
 
    public function logout() {
 
-      
-      // if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["logout"])) {
-      //  var_dump($_SESSION);die();
          if (isset($_SESSION['user_loged_in_id']) && isset($_SESSION['user_loged_in_role'])) {
              unset($_SESSION['user_loged_in_id']);
              unset($_SESSION['user_loged_in_role']);
@@ -102,6 +119,8 @@ class AuthController extends BaseController {
    //   }
    }
 
+   
+   
 
 
 }
